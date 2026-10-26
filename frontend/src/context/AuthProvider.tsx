@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import api from "../services/api";
 import { AuthContext, type AuthUser } from "./AuthContext";
 
-// Keep the provider component separate from shared context and hooks for Fast Refresh.
+// Keep the provider component separate from shared context and hooks.
 const TOKEN_KEY = "smarttask_token";
 const USER_KEY = "smarttask_user";
 
@@ -21,10 +21,7 @@ function readStoredUser(): AuthUser | null {
 
     const parsed: unknown = JSON.parse(storedUser);
 
-    if (
-      !parsed ||
-      typeof parsed !== "object"
-    ) {
+    if (!parsed || typeof parsed !== "object") {
       return null;
     }
 
@@ -33,8 +30,10 @@ function readStoredUser(): AuthUser | null {
     if (
       !Number.isSafeInteger(account.userId) ||
       ![1, 2].includes(account.roleId ?? -1) ||
-      typeof account.mustChangePassword !==
-        "boolean"
+      typeof account.mustChangePassword !== "boolean" ||
+      // Require email so older sessions prompt a fresh login.
+      typeof account.email !== "string" ||
+      !account.email.trim()
     ) {
       return null;
     }
@@ -98,9 +97,7 @@ export function AuthProvider({
       );
     }
 
-    // IMPORTANT FIX:
-    // mustChangePassword belongs to the
-    // main login response data object.
+    // Read the password-change flag from either supported response shape.
     const passwordChangeRequired =
       data?.mustChangePassword === true ||
       account?.mustChangePassword === true;
@@ -112,6 +109,10 @@ export function AuthProvider({
         account.roleId === 1
           ? "ADMIN"
           : "TEAM_MEMBER",
+
+      // Store the successful login email for display in the header.
+      email: email.trim().toLowerCase(),
+
       mustChangePassword: passwordChangeRequired,
     };
 
@@ -159,4 +160,3 @@ export function AuthProvider({
     </AuthContext.Provider>
   );
 }
-
