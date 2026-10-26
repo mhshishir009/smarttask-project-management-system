@@ -6,6 +6,10 @@ export interface AuthUser {
   userId: number;
   roleId: number;
   role: UserRole;
+
+  // Store the signed-in user's email for the header.
+  email: string;
+
   mustChangePassword: boolean;
 }
 
@@ -21,7 +25,9 @@ export interface AuthContextType {
 }
 
 // Shared context and hook live outside the provider component module.
-export const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined
+);
 
 export function useAuth(): AuthContextType {
   const context = useContext(AuthContext);
