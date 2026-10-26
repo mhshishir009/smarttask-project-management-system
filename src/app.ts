@@ -17,9 +17,31 @@ import { container } from "./config/container";
 
 const app = express();
 
-// ==========================================
-// JSON Body Middleware
-// ==========================================
+// Allow the live frontend to call the API and handle preflight requests.
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const allowedOrigin = "https://smarttask-live-demo.vercel.app";
+
+  res.vary("Origin");
+
+  if (req.headers.origin === allowedOrigin) {
+    res.setHeader("Access-Control-Allow-Origin", allowedOrigin);
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization"
+    );
+
+    if (req.method === "OPTIONS") {
+      res.sendStatus(204);
+      return;
+    }
+  }
+
+  next();
+});
 app.use(express.json());
 
 // ==========================================
