@@ -1,4 +1,3 @@
-
 import {
   Outlet,
   useLocation,
@@ -103,8 +102,10 @@ export default function MainLayout() {
   // CLOSE MENUS ON ROUTE CHANGE
   // ==========================================
 
-  // Reset only menu state when the route changes, before rendering the new route.
-  const [menuPathname, setMenuPathname] = useState(location.pathname);
+  // Reset only menu state when the route changes.
+  const [menuPathname, setMenuPathname] =
+    useState(location.pathname);
+
   if (menuPathname !== location.pathname) {
     setMenuPathname(location.pathname);
     setProfileOpen(false);
@@ -182,8 +183,10 @@ export default function MainLayout() {
 
           {/* RIGHT SIDE */}
           <div className="flex shrink-0 items-center gap-3 sm:gap-4">
-            {/* Functional workspace search replaces the previous static label. */}
-            <WorkspaceSearch key={location.pathname + location.search} />
+            {/* Workspace search */}
+            <WorkspaceSearch
+              key={location.pathname + location.search}
+            />
 
             {/* NOTIFICATION ICON */}
             <NotificationBell key={user?.userId} />
@@ -215,9 +218,12 @@ export default function MainLayout() {
                     {roleLabel}
                   </p>
 
-                  <p className="text-xs text-slate-500">
-                    User ID:{" "}
-                    {user?.userId ?? "—"}
+                  {/* Display the signed-in email instead of the user ID. */}
+                  <p
+                    className="text-xs text-slate-500"
+                    title={user?.email}
+                  >
+                    {user?.email ?? "—"}
                   </p>
                 </div>
 
@@ -304,8 +310,10 @@ export default function MainLayout() {
 
         {/* PAGE CONTENT */}
         <main className="flex-1 p-5 lg:p-8">
-          {/* A selected search result starts with fresh page-local filters and form state. */}
-          <Outlet key={location.pathname + location.search} />
+          {/* Reset page-local state when a search result changes the URL. */}
+          <Outlet
+            key={location.pathname + location.search}
+          />
         </main>
       </div>
 
