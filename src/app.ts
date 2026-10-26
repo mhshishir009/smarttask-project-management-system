@@ -1,4 +1,3 @@
-
 import express, {
   Request,
   Response,
@@ -14,6 +13,7 @@ import { createDiscussionRoutes } from "./presentation/routes/discussionRoutes";
 import { createNotificationRoutes } from "./presentation/routes/notificationRoutes";
 
 import { container } from "./config/container";
+import { AppDataSource } from "./infrastructure/database/data-source";
 
 const app = express();
 
@@ -42,6 +42,39 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
   next();
 });
+
+// Initialize the database when this app is loaded directly by Vercel.
+// Concurrent requests share one initialization attempt; failures allow retry.
+let databaseInitialization: Promise<void> | undefined;
+
+app.use(async (
+  _req: Request,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!AppDataSource.isInitialized) {
+      if (!databaseInitialization) {
+        databaseInitialization = AppDataSource.initialize()
+          .then(() => undefined)
+          .catch((error: unknown) => {
+            databaseInitialization = undefined;
+            throw error;
+          });
+      }
+
+      await databaseInitialization;
+    }
+
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
+
+// ==========================================
+// JSON Body Middleware
+// ==========================================
 app.use(express.json());
 
 // ==========================================
@@ -114,9 +147,24 @@ app.use(
   )
 );
 
-// Discussion endpoints have their own authentication and per-project authorization.
-app.use("/api/projects", createDiscussionRoutes(container.discussionController, container.tokenService, container.userRepository));
-app.use("/api/notifications", createNotificationRoutes(container.notificationRepository, container.tokenService, container.userRepository));
+// Discussion endpoints enforce authentication and project authorization.
+app.use(
+  "/api/projects",
+  createDiscussionRoutes(
+    container.discussionController,
+    container.tokenService,
+    container.userRepository
+  )
+);
+
+app.use(
+  "/api/notifications",
+  createNotificationRoutes(
+    container.notificationRepository,
+    container.tokenService,
+    container.userRepository
+  )
+);
 
 // ==========================================
 // 404 - Route Not Found
@@ -137,14 +185,6 @@ app.use((
   res: Response,
   _next: NextFunction
 ) => {
-
-  // ========================================
-  // MALFORMED JSON BODY
-  // ========================================
-  // Express JSON parser generates a
-  // SyntaxError with type "entity.parse.failed"
-  // when incoming JSON is invalid.
-
   const bodyParserError = err as Error & {
     status?: number;
     type?: string;
@@ -163,9 +203,6 @@ app.use((
     return;
   }
 
-  // ========================================
-  // OTHER UNEXPECTED ERRORS
-  // ========================================
   console.error("Unhandled error:", err);
 
   res.status(500).json({
