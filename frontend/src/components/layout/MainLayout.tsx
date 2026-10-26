@@ -1,3 +1,6 @@
+
+
+
 import {
   Outlet,
   useLocation,
@@ -367,13 +370,14 @@ export default function MainLayout() {
               </div>
 
               <div className="rounded-xl bg-slate-50 p-4">
+                {/* Display email in account details instead of the internal user ID. */}
                 <div className="mb-4">
                   <p className="text-xs text-slate-500">
-                    User ID
+                    Email Address
                   </p>
 
-                  <p className="mt-1 font-semibold text-slate-900">
-                    #{user?.userId}
+                  <p className="mt-1 break-all font-semibold text-slate-900">
+                    {user?.email ?? "—"}
                   </p>
                 </div>
 
