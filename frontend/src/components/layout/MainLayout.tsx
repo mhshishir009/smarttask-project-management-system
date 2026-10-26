@@ -251,13 +251,14 @@ export default function MainLayout() {
                         <UserRound size={21} />
                       </div>
 
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-sm font-semibold text-slate-900">
                           {roleLabel}
                         </p>
 
-                        <p className="text-xs text-slate-500">
-                          Account #{user?.userId}
+                        {/* Show email instead of the account number. */}
+                        <p className="break-all text-xs text-slate-500">
+                          {user?.email ?? "—"}
                         </p>
                       </div>
                     </div>
