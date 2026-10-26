@@ -1,6 +1,3 @@
-
-
-
 import {
   Outlet,
   useLocation,
