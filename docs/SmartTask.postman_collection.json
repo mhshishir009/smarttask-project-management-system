@@ -1,0 +1,810 @@
+{
+  "info": {
+    "name": "SmartTask - Recruitment Assignment API",
+    "description": "31 documented method/path combinations. Configure local credentials/IDs before use. Do not run the whole collection blindly: DELETE/deactivate requests are included. No real token or credential is saved. Login captures the token; mandatory password change requires a fresh login. Author: Mahedee Hasan Shishir.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "adminPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "newAdminPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberEmail",
+      "value": "member@example.invalid",
+      "type": "string"
+    },
+    {
+      "key": "memberPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invitedEmail",
+      "value": "invited@example.invalid",
+      "type": "string"
+    },
+    {
+      "key": "temporaryPassword",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "invitedMemberId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "memberRoleId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "roleCode",
+      "value": "TEAM_MEMBER",
+      "type": "string"
+    },
+    {
+      "key": "projectId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "expectedVersion",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "newStatus",
+      "value": "IN_PROGRESS",
+      "type": "string"
+    },
+    {
+      "key": "notificationId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "throughId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "API health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/health",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "auth": {
+              "type": "noauth"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register demo Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/register",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Demo Member\",\n  \"email\": \"{{memberEmail}}\",\n  \"password\": \"{{memberPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.userId) pm.collectionVariables.set('memberId',String(data.userId));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Login - configure Admin or Member credentials locally",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/login",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.accessToken) pm.collectionVariables.set('accessToken',data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Change password - fresh Login required afterwards",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/auth/change-password",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"{{adminPassword}}\",\n  \"newPassword\": \"{{newAdminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if(pm.response.code===200) pm.collectionVariables.set('accessToken','');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Roles",
+      "item": [
+        {
+          "name": "List roles",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/roles",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Get role by code and capture Member role ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/roles/code/{{roleCode}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.roleCode==='TEAM_MEMBER') pm.collectionVariables.set('memberRoleId',String(data.roleId));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get role by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/roles/{{memberRoleId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users - Admin",
+      "item": [
+        {
+          "name": "Create invited Member",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"fullName\":\"Invited Member\",\"email\":\"{{invitedEmail}}\",\"roleId\":{{memberRoleId}},\"temporaryPassword\":\"{{temporaryPassword}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.userId) pm.collectionVariables.set('invitedMemberId',String(data.userId));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Get Member",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{memberId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Update Member name",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/users/{{memberId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Demo Member Updated\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "DESTRUCTIVE: Deactivate disposable Member",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/users/{{memberId}}/deactivate",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create demo project",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/projects",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Submission Demo\",\n  \"description\": \"Disposable recruitment demonstration project\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.projectId) pm.collectionVariables.set('projectId',String(data.projectId));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List projects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/projects",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Get project",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/projects/{{projectId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Edit project",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/projects/{{projectId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Submission Demo Updated\",\n  \"description\": \"Updated demonstration scope\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Archive project - all tasks must be DONE",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/projects/{{projectId}}/archive",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "DESTRUCTIVE: Delete eligible empty project",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{baseUrl}}/projects/{{projectId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create assigned task",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/tasks",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"projectId\":{{projectId}},\"assigneeId\":{{memberId}},\"title\":\"Review workflow\",\"description\":\"Disposable demo task\",\"priority\":\"HIGH\",\"dueAt\":null}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if (data && data.taskId) pm.collectionVariables.set('taskId', String(data.taskId));",
+                  "  if (data && data.version) pm.collectionVariables.set('expectedVersion', String(data.version));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List/filter tasks - Admin",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/tasks?projectId={{projectId}}&status=TODO&priority=HIGH&assigneeId={{memberId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Project tasks - Member sees own assignments",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/tasks/project/{{projectId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Get task and current version",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/tasks/{{taskId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if (data && data.taskId) pm.collectionVariables.set('taskId', String(data.taskId));",
+                  "  if (data && data.version) pm.collectionVariables.set('expectedVersion', String(data.version));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update task details",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/tasks/{{taskId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"title\":\"Review workflow updated\",\"description\":null,\"priority\":\"MEDIUM\",\"dueAt\":null,\"expectedVersion\":{{expectedVersion}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if (data && data.taskId) pm.collectionVariables.set('taskId', String(data.taskId));",
+                  "  if (data && data.version) pm.collectionVariables.set('expectedVersion', String(data.version));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Advance task status - adjust newStatus for next transition",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/tasks/{{taskId}}/status",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"status\":\"{{newStatus}}\",\"expectedVersion\":{{expectedVersion}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if (data && data.taskId) pm.collectionVariables.set('taskId', String(data.taskId));",
+                  "  if (data && data.version) pm.collectionVariables.set('expectedVersion', String(data.version));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reassign to invited Member",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/tasks/{{taskId}}/assign",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"assigneeId\":{{invitedMemberId}},\"expectedVersion\":{{expectedVersion}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if (data && data.taskId) pm.collectionVariables.set('taskId', String(data.taskId));",
+                  "  if (data && data.version) pm.collectionVariables.set('expectedVersion', String(data.version));",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DESTRUCTIVE: Delete task with latest version",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/tasks/{{taskId}}",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"expectedVersion\":{{expectedVersion}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Project Discussion",
+      "item": [
+        {
+          "name": "Read latest discussion - add before cursor for older messages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/projects/{{projectId}}/messages",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Send project discussion message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/projects/{{projectId}}/messages",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Ready for review.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {
+          "name": "Own notifications - capture latest row/snapshot IDs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/notifications",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code >= 200 && pm.response.code < 300) {",
+                  "  const data = pm.response.json().data;",
+                  "  if(data && data.notifications && data.notifications.length){const id=String(data.notifications[0].notificationId);pm.collectionVariables.set('notificationId',id);pm.collectionVariables.set('throughId',id);}",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark own notification read",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "url": "{{baseUrl}}/notifications/{{notificationId}}/read",
+            "description": "See docs/API.md. Run individually against disposable demo records."
+          }
+        },
+        {
+          "name": "Mark snapshot read",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{baseUrl}}/notifications/read-all",
+            "description": "See docs/API.md. Run individually against disposable demo records.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"throughId\":{{throughId}}}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

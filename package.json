@@ -1,0 +1,49 @@
+{
+  "name": "smarttaskprojectmanagementsystem",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "prestart": "npm run build",
+    "start": "node dist/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "predb:check": "npm run build",
+    "db:check": "node dist/infrastructure/database/testConnection.js",
+    "predb:create": "npm run build",
+    "db:create": "node dist/infrastructure/database/createDatabase.js",
+    "premigration:show": "npm run build",
+    "migration:show": "typeorm migration:show -d dist/infrastructure/database/data-source.js",
+    "premigration:run": "npm run build",
+    "migration:run": "typeorm migration:run -d dist/infrastructure/database/data-source.js",
+    "preseed:roles": "npm run build",
+    "seed:roles": "node dist/infrastructure/database/seedRoles.js",
+    "preseed:admin": "npm run build",
+    "seed:admin": "node dist/infrastructure/database/seedAdmin.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "argon2": "^0.45.1",
+    "dotenv": "^18.0.8",
+    "express": "^5.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.1",
+    "reflect-metadata": "^0.2.2",
+    "tailwindcss": "^4.3.3",
+    "typeorm": "^1.1.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.5",
+    "@types/pg": "^8.23.1",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
